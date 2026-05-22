@@ -251,4 +251,30 @@ BEGIN
 END;
 GO
 
+-- LOGIN USUARIO
+USE SolucionesFinancieras;
+GO
+
+CREATE PROCEDURE LoginUsuario
+(
+    @NombreUsuario VARCHAR(50),
+    @Clave VARCHAR(100)
+)
+AS
+BEGIN
+    SELECT
+        Usuarios.IdUsuario,
+        Usuarios.NombreUsuario,
+        Usuarios.NombreCompleto,
+        Roles.NombreRol
+    FROM Usuarios
+    INNER JOIN Roles
+        ON Usuarios.IdRol = Roles.IdRol
+    WHERE
+        Usuarios.NombreUsuario = @NombreUsuario
+        AND Usuarios.Clave = @Clave
+        AND Usuarios.Estado = 'Activo';
+END;
+GO
+
 
