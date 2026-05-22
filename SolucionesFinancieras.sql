@@ -53,3 +53,29 @@ CREATE TABLE Cuotas (
     FOREIGN KEY (IdPrestamo)
     REFERENCES Prestamos(IdPrestamo)
 );
+
+-- TABLA ROLES
+CREATE TABLE Roles (
+    IdRol INT PRIMARY KEY IDENTITY(1,1),
+    NombreRol VARCHAR(50) NOT NULL
+);
+
+-- TABLA USUARIOS
+CREATE TABLE Usuarios (
+    IdUsuario INT PRIMARY KEY IDENTITY(1,1),
+    NombreUsuario VARCHAR(50) NOT NULL,
+    Clave VARCHAR(100) NOT NULL,
+    NombreCompleto VARCHAR(100) NOT NULL,
+    IdRol INT NOT NULL,
+    Estado VARCHAR(20) DEFAULT 'Activo',
+
+    FOREIGN KEY (IdRol)
+    REFERENCES Roles(IdRol)
+);
+
+-- ROLES
+INSERT INTO Roles (NombreRol)
+VALUES
+('Administrador'),
+('Cobrador'),
+('Programador Backend');
