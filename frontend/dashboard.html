@@ -1,0 +1,130 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard – Soluciones Financieras</title>
+  <link rel="stylesheet" href="css/styles.css"/>
+</head>
+<body class="dashboard-page">
+  <div class="layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <span class="brand-icon">&#9956;</span>
+        <span class="brand-name">SolFin</span>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="dashboard.html" class="nav-item active">
+          <span class="nav-icon">&#9783;</span> Dashboard
+        </a>
+        <a href="#" class="nav-item">
+          <span class="nav-icon">&#128100;</span> Clientes
+        </a>
+        <a href="#" class="nav-item">
+          <span class="nav-icon">&#128176;</span> Préstamos
+        </a>
+        <a href="#" class="nav-item">
+          <span class="nav-icon">&#128179;</span> Pagos
+        </a>
+        <a href="#" class="nav-item">
+          <span class="nav-icon">&#128202;</span> Reportes
+        </a>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="user-info">
+          <div class="user-avatar" id="userAvatar">A</div>
+          <div>
+            <div class="user-name" id="userName">Admin</div>
+            <div class="user-role" id="userRole">Administrador</div>
+          </div>
+        </div>
+        <button class="btn-logout" onclick="logout()">Salir</button>
+      </div>
+    </aside>
+
+    <!-- Contenido principal -->
+    <main class="main-content">
+      <header class="topbar">
+        <h1>Dashboard</h1>
+        <button class="btn-primary">+ Nuevo Préstamo</button>
+      </header>
+
+      <!-- Tarjetas de métricas -->
+      <section class="metrics-grid">
+        <div class="metric-card">
+          <div class="metric-label">Capital Activo</div>
+          <div class="metric-value" id="capitalActivo">RD$0</div>
+          <div class="metric-sub">Total en préstamos activos</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Clientes Activos</div>
+          <div class="metric-value" id="totalClientes">0</div>
+          <div class="metric-sub" id="clientesNuevos">Este mes</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Cobros Pendientes</div>
+          <div class="metric-value" id="cuotasPendientes">0</div>
+          <div class="metric-sub">Cuotas por cobrar</div>
+        </div>
+        <div class="metric-card metric-alert">
+          <div class="metric-label">En Atraso</div>
+          <div class="metric-value" id="prestamosAtraso">0</div>
+          <div class="metric-sub" id="montoAtraso">préstamos vencidos</div>
+        </div>
+      </section>
+
+      <!-- Tabla + Panel derecho -->
+      <section class="bottom-grid">
+        <!-- Tabla préstamos recientes -->
+        <div class="card">
+          <div class="card-header">
+            <h2>Préstamos Recientes</h2>
+          </div>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Cliente</th>
+                <th>Monto</th>
+                <th>Progreso</th>
+                <th>Estado</th>
+                <th>Próximo Pago</th>
+              </tr>
+            </thead>
+            <tbody id="tablaPrestamos">
+              <tr><td colspan="5" class="loading-row">Cargando...</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Panel derecho -->
+        <div class="right-panel">
+          <!-- Alertas -->
+          <div class="card alerts-card">
+            <div class="card-header">
+              <h2>&#9888; Alertas del Sistema</h2>
+            </div>
+            <ul class="alerts-list" id="listaAlertas">
+              <li class="loading-row">Cargando...</li>
+            </ul>
+          </div>
+
+          <!-- Cobros hoy -->
+          <div class="card cobros-card">
+            <div class="card-header">
+              <h2>Cobros de Hoy</h2>
+            </div>
+            <ul class="cobros-list" id="listaCobros">
+              <li class="loading-row">Cargando...</li>
+            </ul>
+            <div class="cobros-total">
+              Total: <strong id="totalCobros">RD$0</strong>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+  <script src="js/dashboard.js"></script>
+</body>
+</html>
