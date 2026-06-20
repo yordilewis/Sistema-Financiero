@@ -1,4 +1,4 @@
-﻿const API_BASE = 'http://localhost:5000/api';
+﻿const API_BASE = '/api';
 
 function getToken() {
   return sessionStorage.getItem('token') || localStorage.getItem('token');
@@ -23,7 +23,6 @@ function fmtFecha(d) {
   return new Date(d).toLocaleDateString('es-DO', { day:'2-digit', month:'short', year:'numeric' });
 }
 
-// Cargar info usuario
 (function() {
   const u = JSON.parse(sessionStorage.getItem('usuario') || localStorage.getItem('usuario') || '{}');
   if (u.nombreCompleto) {
@@ -45,7 +44,6 @@ async function fetchDashboard() {
     document.getElementById('prestamosAtraso').textContent   = d.prestamosEnAtraso || 0;
     document.getElementById('montoAtraso').textContent       = fmt(d.montoEnAtraso || 0) + ' en mora';
   } catch {
-    // demo
     document.getElementById('capitalActivo').textContent    = 'RD$485,000';
     document.getElementById('totalClientes').textContent    = '24';
     document.getElementById('clientesNuevos').textContent   = '+3 este mes';
@@ -56,12 +54,10 @@ async function fetchDashboard() {
 }
 
 async function fetchPrestamos() {
-  const tbody = document.getElementById('tablaPrestamos');
   try {
     const res = await fetch(`${API_BASE}/dashboard/prestamos/recientes`, { headers: { Authorization: `Bearer ${getToken()}` } });
     if (!res.ok) throw new Error();
-    const list = await res.json();
-    renderPrestamos(list);
+    renderPrestamos(await res.json());
   } catch {
     renderPrestamos([
       { idPrestamo:1, clienteNombre:'Carlos Mendoza', monto:25000, progreso:58, estado:'Activo', proximoPago:'2025-07-15' },
@@ -110,7 +106,6 @@ async function fetchAlertas() {
 }
 
 async function fetchCobrosHoy() {
-  const ul = document.getElementById('listaCobros');
   try {
     const res = await fetch(`${API_BASE}/dashboard/cobros-hoy`, { headers: { Authorization: `Bearer ${getToken()}` } });
     if (!res.ok) throw new Error();
