@@ -1,0 +1,21 @@
+﻿{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Iniciar Sistema Financiero",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build",
+      "program": "${workspaceFolder}/backend/SolucionesFinancieras.API/bin/Debug/net8.0/SolucionesFinancieras.API.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/backend/SolucionesFinancieras.API",
+      "stopAtEntry": false,
+      "env": { "ASPNETCORE_ENVIRONMENT": "Development" },
+      "serverReadyAction": {
+        "action": "openExternally",
+        "pattern": "\\bNow listening on:\\s+(https?://\\S+)",
+        "uriFormat": "%s/login.html"
+      }
+    }
+  ]
+}

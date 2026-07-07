@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Préstamos – LondX</title>
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml"/>
+  <link rel="stylesheet" href="css/styles.css"/>
+</head>
+<body class="dashboard-page" data-page="prestamos">
+  <div class="layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <div class="brand-icon"><img src="assets/img/mark-gold.svg" alt="Logo"/></div>
+        <div class="brand-text">
+          <div class="brand-name">LondX</div>
+          <div class="brand-sub">Sistema v1.0</div>
+        </div>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="dashboard.html" class="nav-item" data-page="dashboard">
+          <span class="icon" data-icon="dashboard" data-size="17"></span> Dashboard
+        </a>
+        <a href="clientes.html" class="nav-item" data-page="clientes">
+          <span class="icon" data-icon="clients" data-size="17"></span> Clientes
+        </a>
+        <a href="prestamos.html" class="nav-item" data-page="prestamos">
+          <span class="icon" data-icon="loans" data-size="17"></span> Préstamos
+        </a>
+        <a href="pagos.html" class="nav-item" data-page="pagos">
+          <span class="icon" data-icon="payments" data-size="17"></span> Pagos
+        </a>
+        <a href="reportes.html" class="nav-item" data-page="reportes">
+          <span class="icon" data-icon="reports" data-size="17"></span> Reportes
+        </a>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="user-info">
+          <div class="user-avatar" id="userAvatar">A</div>
+          <div>
+            <div class="user-name" id="userName">Admin</div>
+            <div class="user-role" id="userRole">Administrador</div>
+          </div>
+        </div>
+        <button class="btn-logout" onclick="logout()">
+          <span class="icon" data-icon="back" data-size="14"></span> Salir
+        </button>
+      </div>
+    </aside>
+
+    <!-- Contenido principal -->
+    <main class="main-content">
+      <header class="topbar">
+        <div class="topbar-title">
+          <h1>Gestión de Préstamos</h1>
+          <p>Control completo de préstamos activos</p>
+        </div>
+        <div class="topbar-actions">
+          <div class="topbar-search">
+            <span class="icon" data-icon="search" data-size="15"></span>
+            <input placeholder="Buscar..." id="buscarPrestamo"/>
+          </div>
+          <div class="topbar-divider"></div>
+          <div class="topbar-bell">
+            <span class="icon" data-icon="bell" data-size="19"></span>
+            <span class="dot"></span>
+          </div>
+          <a href="clientes.html" class="btn-dark">
+            <span class="icon" data-icon="plus" data-size="13"></span> Nuevo
+          </a>
+        </div>
+      </header>
+
+      <div class="page-content">
+        <div class="metrics-grid">
+          <div class="metric-card accent-green">
+            <div class="metric-top">
+              <span class="metric-label">Préstamos Activos</span>
+              <div class="metric-icon-wrap"><span class="icon" data-icon="loans" data-size="16"></span></div>
+            </div>
+            <div class="metric-value" id="sumActivos">0</div>
+            <div class="metric-sub">Vigentes al día</div>
+          </div>
+          <div class="metric-card accent-red">
+            <div class="metric-top">
+              <span class="metric-label">En Atraso</span>
+              <div class="metric-icon-wrap"><span class="icon" data-icon="alert" data-size="16"></span></div>
+            </div>
+            <div class="metric-value" id="sumAtraso">0</div>
+            <div class="metric-sub">Requieren gestión</div>
+          </div>
+          <div class="metric-card accent-navy">
+            <div class="metric-top">
+              <span class="metric-label">Saldados</span>
+              <div class="metric-icon-wrap"><span class="icon" data-icon="check" data-size="16"></span></div>
+            </div>
+            <div class="metric-value" id="sumSaldados">0</div>
+            <div class="metric-sub">Pagados en total</div>
+          </div>
+          <div class="metric-card accent-gold">
+            <div class="metric-top">
+              <span class="metric-label">Capital Activo</span>
+              <div class="metric-icon-wrap"><span class="icon" data-icon="trend" data-size="16"></span></div>
+            </div>
+            <div class="metric-value" id="sumCapital">RD$0</div>
+            <div class="metric-sub">En préstamos vigentes</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h2>Todos los Préstamos</h2>
+            <div class="filter-group" id="filterGroup">
+              <button class="filter-btn active" data-filter="Todos">Todos</button>
+              <button class="filter-btn" data-filter="Activo">Activos</button>
+              <button class="filter-btn" data-filter="Atrasado">En Atraso</button>
+              <button class="filter-btn" data-filter="Saldado">Saldados</button>
+            </div>
+          </div>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Cliente</th>
+                <th>Monto</th>
+                <th>Tasa</th>
+                <th>Progreso</th>
+                <th>Estado</th>
+                <th>Próx. Pago</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="tablaPrestamosFull">
+              <tr><td colspan="8" class="loading-row">Cargando...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- ── MODAL: Gestionar Préstamo ── -->
+  <div class="modal-overlay" id="modalGestion">
+    <div class="modal">
+      <div class="modal-head">
+        <h2>Gestionar Préstamo</h2>
+        <button class="modal-close" onclick="closeModal('modalGestion')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="entity-card" id="gestionCard"></div>
+
+        <div class="section-title">¿Qué deseas hacer con este préstamo?</div>
+        <div class="section-sub">Selecciona una acción para actualizar el estado del préstamo</div>
+        <div style="height:18px"></div>
+
+        <div class="action-list" id="accionesList">
+          <div class="action-option" data-action="Atrasado" onclick="seleccionarAccion(this)">
+            <div class="action-icon warn"><span class="icon" data-icon="alert" data-size="20"></span></div>
+            <div class="action-text">
+              <div class="action-title">Marcar como Atrasado</div>
+              <div class="action-desc">El cliente no realizó el pago en la fecha establecida</div>
+            </div>
+            <div class="action-radio"></div>
+          </div>
+          <div class="action-option" data-action="Parcial" onclick="seleccionarAccion(this)">
+            <div class="action-icon pay"><span class="icon" data-icon="payments" data-size="20"></span></div>
+            <div class="action-text">
+              <div class="action-title">Registrar Pago Parcial</div>
+              <div class="action-desc">El cliente abonó parte del monto de la cuota pendiente</div>
+            </div>
+            <div class="action-radio"></div>
+          </div>
+          <div class="action-option" data-action="Saldado" onclick="seleccionarAccion(this)">
+            <div class="action-icon done"><span class="icon" data-icon="check" data-size="20"></span></div>
+            <div class="action-text">
+              <div class="action-title">Marcar como Saldado</div>
+              <div class="action-desc">El préstamo fue pagado en su totalidad por el cliente</div>
+            </div>
+            <div class="action-radio"></div>
+          </div>
+        </div>
+
+        <div class="action-detail hidden" id="detallePago">
+          <div class="action-detail-label">Detalle del Pago Parcial</div>
+          <div class="form-grid-3">
+            <div class="field"><label>Monto Abonado</label><input type="text" id="gMonto" placeholder="RD$0.00"/></div>
+            <div class="field"><label>Fecha de Pago</label><input type="date" id="gFecha"/></div>
+            <div class="field"><label>Método</label>
+              <select id="gMetodo"><option>Efectivo</option><option>Transferencia</option></select>
+            </div>
+          </div>
+          <div class="action-note">
+            <span class="icon" data-icon="alert" data-size="13"></span>
+            El saldo pendiente se recalculará automáticamente después de confirmar el pago.
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn-primary" style="flex:2" onclick="confirmarGestion()">Confirmar Gestión</button>
+          <button type="button" class="btn-outline" style="flex:1" onclick="closeModal('modalGestion')">Cancelar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/icons.js"></script>
+  <script src="js/nav.js"></script>
+  <script src="js/common.js"></script>
+  <script src="js/prestamos.js"></script>
+</body>
+</html>

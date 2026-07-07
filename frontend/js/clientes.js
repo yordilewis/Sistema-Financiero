@@ -1,0 +1,150 @@
+﻿let clientesData = [];
+let clienteSeleccionado = null;
+
+async function fetchClientes() {
+  try {
+    const res = await fetch(`${API_BASE}/clientes`, { headers: authHeaders() });
+    if (!res.ok) throw new Error();
+    clientesData = await res.json();
+  } catch {
+    clientesData = [
+      { id: 'C-001', nombre: 'Carlos',  apellido: 'Mendoza', telefono: '809-555-0101', cedula: '012-3456789-1', estado: 'Activo'   },
+      { id: 'C-002', nombre: 'Ana',     apellido: 'Jiménez', telefono: '809-555-0202', cedula: '023-4567890-2', estado: 'Activo'   },
+      { id: 'C-003', nombre: 'Roberto', apellido: 'Sosa',    telefono: '809-555-0303', cedula: '034-5678901-3', estado: 'Atrasado' },
+      { id: 'C-004', nombre: 'Luisa',   apellido: 'Pérez',   telefono: '809-555-0404', cedula: '045-6789012-4', estado: 'Activo'   },
+      { id: 'C-005', nombre: 'Miguel',  apellido: 'Torres',  telefono: '809-555-0505', cedula: '056-7890123-5', estado: 'Saldado'  },
+    ];
+  }
+  // Añade clientes creados en esta sesión.
+  const nuevos = JSON.parse(localStorage.getItem('nuevosClientes') || '[]');
+  clientesData = clientesData.concat(nuevos);
+  renderClientes();
+}
+
+function valFiltro(id) { return (document.getElementById(id).value || '').trim().toLowerCase(); }
+
+function renderClientes() {
+  const f = {
+    id: valFiltro('fId'), cedula: valFiltro('fCedula'), nombre: valFiltro('fNombre'),
+    apellido: valFiltro('fApellido'), telefono: valFiltro('fTelefono'),
+  };
+  const list = clientesData.filter(c =>
+    c.id.toLowerCase().includes(f.id) &&
+    c.cedula.toLowerCase().includes(f.cedula) &&
+    c.nombre.toLowerCase().includes(f.nombre) &&
+    c.apellido.toLowerCase().includes(f.apellido) &&
+    c.telefono.toLowerCase().includes(f.telefono)
+  );
+  const tbody = document.getElementById('tablaClientes');
+  if (!list.length) { tbody.innerHTML = '<tr><td colspan="7" class="loading-row">Sin resultados</td></tr>'; return; }
+  tbody.innerHTML = list.map(c => `
+    <tr>
+      <td class="mono" style="color:var(--gold); font-weight:700">${c.id}</td>
+      <td>
+        <div class="name-cell">
+          <div class="avatar-chip">${initials(c.nombre + ' ' + c.apellido)}</div>
+          <span class="cell-strong">${c.nombre}</span>
+        </div>
+      </td>
+      <td class="cell-strong">${c.apellido}</td>
+      <td class="mono">${c.telefono}</td>
+      <td class="mono" style="color:var(--slate)">${c.cedula}</td>
+      <td>${badgeEstado(c.estado)}</td>
+      <td style="text-align:right">
+        <button class="btn-dark" onclick='abrirCrearPrestamo(${JSON.stringify(c)})'>
+          <span class="icon" data-icon="plus" data-size="12"></span> Crear Préstamo
+        </button>
+      </td>
+    </tr>`).join('');
+  renderIcons(tbody);
+}
+
+// ── Registro de cliente ──────────────────────────────────────
+function abrirRegistro() { openModal('modalRegistro'); }
+
+function guardarCliente(e) {
+  e.preventDefault();
+  const nombre   = document.getElementById('rNombre').value.trim();
+  const apellido = document.getElementById('rApellido').value.trim();
+  const telefono = document.getElementById('rTelefono').value.trim();
+  const cedula   = document.getElementById('rCedula').value.trim() || '000-0000000-0';
+  if (!nombre || !apellido || !telefono) return;
+
+  const nuevo = { id: 'C-' + String(clientesData.length + 1).padStart(3, '0'), nombre, apellido, telefono, cedula, estado: 'Activo' };
+  clientesData.push(nuevo);
+
+  const nuevos = JSON.parse(localStorage.getItem('nuevosClientes') || '[]');
+  nuevos.push(nuevo);
+  localStorage.setItem('nuevosClientes', JSON.stringify(nuevos));
+
+  document.getElementById('formRegistro').reset();
+  closeModal('modalRegistro');
+  renderClientes();
+}
+
+// ── Crear préstamo ───────────────────────────────────────────
+function abrirCrearPrestamo(cliente) {
+  clienteSeleccionado = cliente;
+  document.getElementById('prestamoModalTitle').textContent = 'Crear Préstamo';
+  document.getElementById('prestamoFormView').classList.remove('hidden');
+  document.getElementById('prestamoSuccessView').classList.add('hidden');
+  document.getElementById('formPrestamo').reset();
+
+  const badgeClass = cliente.estado === 'Atrasado' ? 'badge-atraso' : cliente.estado === 'Saldado' ? 'badge-saldado' : 'badge-activo';
+  document.getElementById('prestamoClienteCard').innerHTML = `
+    <div class="entity-main">
+      <div class="entity-avatar">${initials(cliente.nombre + ' ' + cliente.apellido)}</div>
+      <div class="entity-meta">
+        <div class="entity-tag">ID Cliente</div>
+        <div class="entity-id">${cliente.id}</div>
+        <div class="entity-name">${cliente.nombre} ${cliente.apellido}</div>
+      </div>
+    </div>
+    <div class="entity-side">
+      <span class="badge ${badgeClass}">Cliente ${cliente.estado}</span>
+      <div class="entity-phone"><span class="icon" data-icon="phone" data-size="13"></span>${cliente.telefono}</div>
+    </div>`;
+  openModal('modalPrestamo');
+}
+
+function aprobarPrestamo(e) {
+  e.preventDefault();
+  const montoRaw = document.getElementById('pMonto').value.replace(/[^\d.]/g, '');
+  const monto   = parseFloat(montoRaw) || 0;
+  const plazo   = parseInt(document.getElementById('pPlazo').value) || 0;
+  const interes = document.getElementById('pInteres').value.trim() || '0%';
+  const frecuencia = document.getElementById('pFrecuencia').value;
+  if (!monto || !plazo) return;
+
+  // Genera un ID de préstamo consecutivo y lo guarda para la vista de Préstamos.
+  const nuevos = JSON.parse(localStorage.getItem('nuevosPrestamos') || '[]');
+  const idNum = 6 + nuevos.length;
+  const idPrestamo = 'P-' + String(idNum).padStart(3, '0');
+
+  nuevos.push({
+    id: idPrestamo,
+    cliente: `${clienteSeleccionado.nombre} ${clienteSeleccionado.apellido}`,
+    telefono: clienteSeleccionado.telefono,
+    monto, tasa: interes, cuotas: plazo, pagadas: 0,
+    estado: 'Activo', proximoPago: frecuencia,
+  });
+  localStorage.setItem('nuevosPrestamos', JSON.stringify(nuevos));
+
+  // Pantalla de confirmación.
+  document.getElementById('approveId').textContent      = idPrestamo;
+  document.getElementById('approveMonto').textContent   = fmt(monto);
+  document.getElementById('approveInteres').textContent = interes;
+  document.getElementById('approveCuotas').textContent  = `${plazo} pagos`;
+  document.getElementById('prestamoModalTitle').textContent = 'Confirmación Préstamo';
+  document.getElementById('prestamoFormView').classList.add('hidden');
+  const success = document.getElementById('prestamoSuccessView');
+  success.classList.remove('hidden');
+  renderIcons(success);
+}
+
+// Filtrado en vivo a medida que se escribe.
+['fId', 'fCedula', 'fNombre', 'fApellido', 'fTelefono'].forEach(id => {
+  document.getElementById(id).addEventListener('input', renderClientes);
+});
+
+fetchClientes();

@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Pagos – LondX</title>
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml"/>
+  <link rel="stylesheet" href="css/styles.css"/>
+</head>
+<body class="dashboard-page" data-page="pagos">
+  <div class="layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <div class="brand-icon"><img src="assets/img/mark-gold.svg" alt="Logo"/></div>
+        <div class="brand-text">
+          <div class="brand-name">LondX</div>
+          <div class="brand-sub">Sistema v1.0</div>
+        </div>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="dashboard.html" class="nav-item" data-page="dashboard">
+          <span class="icon" data-icon="dashboard" data-size="17"></span> Dashboard
+        </a>
+        <a href="clientes.html" class="nav-item" data-page="clientes">
+          <span class="icon" data-icon="clients" data-size="17"></span> Clientes
+        </a>
+        <a href="prestamos.html" class="nav-item" data-page="prestamos">
+          <span class="icon" data-icon="loans" data-size="17"></span> Préstamos
+        </a>
+        <a href="pagos.html" class="nav-item" data-page="pagos">
+          <span class="icon" data-icon="payments" data-size="17"></span> Pagos
+        </a>
+        <a href="reportes.html" class="nav-item" data-page="reportes">
+          <span class="icon" data-icon="reports" data-size="17"></span> Reportes
+        </a>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="user-info">
+          <div class="user-avatar" id="userAvatar">A</div>
+          <div>
+            <div class="user-name" id="userName">Admin</div>
+            <div class="user-role" id="userRole">Administrador</div>
+          </div>
+        </div>
+        <button class="btn-logout" onclick="logout()">
+          <span class="icon" data-icon="back" data-size="14"></span> Salir
+        </button>
+      </div>
+    </aside>
+
+    <!-- Contenido principal -->
+    <main class="main-content">
+      <header class="topbar">
+        <div class="topbar-title">
+          <h1>Registro de Pagos</h1>
+          <p>Historial y registro de cuotas</p>
+        </div>
+        <div class="topbar-actions">
+          <div class="topbar-search">
+            <span class="icon" data-icon="search" data-size="15"></span>
+            <input placeholder="Buscar..."/>
+          </div>
+          <div class="topbar-divider"></div>
+          <div class="topbar-bell">
+            <span class="icon" data-icon="bell" data-size="19"></span>
+            <span class="dot"></span>
+          </div>
+          <button class="btn-dark">
+            <span class="icon" data-icon="plus" data-size="13"></span> Nuevo
+          </button>
+        </div>
+      </header>
+
+      <div class="page-content">
+        <div class="payments-grid">
+          <div class="card">
+            <div class="card-header">
+              <h2>Historial de Pagos</h2>
+            </div>
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Recibo</th>
+                  <th>Cliente</th>
+                  <th>Préstamo</th>
+                  <th>Monto</th>
+                  <th>Fecha</th>
+                  <th>Método</th>
+                </tr>
+              </thead>
+              <tbody id="tablaPagos">
+                <tr><td colspan="6" class="loading-row">Cargando...</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="card payment-form-card">
+            <div class="form-title">Registrar Pago</div>
+            <form id="formPago" onsubmit="handleRegistrarPago(event)">
+              <div class="field">
+                <label for="pagoCliente">Cliente</label>
+                <select id="pagoCliente"><option value="">Seleccionar cliente</option></select>
+              </div>
+              <div class="field">
+                <label for="pagoPrestamo">Préstamo</label>
+                <select id="pagoPrestamo"><option value="">Seleccionar préstamo</option></select>
+              </div>
+              <div class="field">
+                <label for="pagoMonto">Monto</label>
+                <input type="text" id="pagoMonto" placeholder="RD$0.00"/>
+              </div>
+              <div class="field">
+                <label for="pagoFecha">Fecha</label>
+                <input type="date" id="pagoFecha"/>
+              </div>
+              <div class="field">
+                <label for="pagoMetodo">Método</label>
+                <select id="pagoMetodo">
+                  <option value="Efectivo">Efectivo</option>
+                  <option value="Transferencia">Transferencia</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="pagoNotas">Notas</label>
+                <textarea id="pagoNotas" rows="3" placeholder="Observaciones (opcional)"></textarea>
+              </div>
+              <button type="submit" class="btn-primary btn-full">Confirmar Pago</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+  <script src="js/icons.js"></script>
+  <script src="js/nav.js"></script>
+  <script src="js/common.js"></script>
+  <script src="js/pagos.js"></script>
+</body>
+</html>

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>LondX – Login</title>
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml"/>
+  <link rel="stylesheet" href="css/styles.css"/>
+</head>
+<body class="login-page">
+  <div class="login-container">
+    <!-- Panel izquierdo -->
+    <div class="login-left">
+      <div class="login-brand">
+        <div class="login-mark"><img src="assets/img/mark-gold.svg" alt="LondX"/></div>
+        <h1>Lond<em>X</em></h1>
+        <p class="login-tagline">Sistema de Gestión de Préstamos</p>
+      </div>
+      <blockquote class="login-quote">
+        "El ahorro es la base de la riqueza."
+        <cite>— Friedrich Hayek</cite>
+      </blockquote>
+    </div>
+    <!-- Panel derecho -->
+    <div class="login-right">
+      <div class="login-form-wrapper">
+        <h2>Iniciar Sesión</h2>
+        <p class="login-subtitle">Accede a tu cuenta para continuar</p>
+        <form id="loginForm" onsubmit="handleLogin(event)">
+          <div class="form-group">
+            <label for="usuario">Usuario</label>
+            <div class="input-with-icon">
+              <span class="icon" data-icon="user" data-size="16"></span>
+              <input type="text" id="usuario" name="usuario" placeholder="Tu usuario" required/>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="password">Contraseña</label>
+            <div class="input-with-icon input-password">
+              <span class="icon" data-icon="lock" data-size="16"></span>
+              <input type="password" id="password" name="password" placeholder="Tu contraseña" required/>
+              <button type="button" class="toggle-pw" onclick="togglePassword()">
+                <span class="icon" id="pwIcon" data-icon="eye" data-size="17"></span>
+              </button>
+            </div>
+          </div>
+          <div class="form-row">
+            <label class="checkbox-label">
+              <input type="checkbox" id="remember"/> Recordarme
+            </label>
+            <a href="#" class="forgot-link">¿Olvidaste tu contraseña?</a>
+          </div>
+          <div id="loginError" class="error-msg" style="display:none">
+            <span class="icon" data-icon="alert" data-size="15"></span>
+            <span id="loginErrorText"></span>
+          </div>
+          <button type="submit" class="btn-primary btn-full" id="btnLogin">Ingresar</button>
+        </form>
+      </div>
+    </div>
+  </div>
+  <script src="js/icons.js"></script>
+  <script src="js/login.js"></script>
+</body>
+</html>

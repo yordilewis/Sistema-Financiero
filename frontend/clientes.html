@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Clientes – LondX</title>
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml"/>
+  <link rel="stylesheet" href="css/styles.css"/>
+</head>
+<body class="dashboard-page" data-page="clientes">
+  <div class="layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <div class="brand-icon"><img src="assets/img/mark-gold.svg" alt="Logo"/></div>
+        <div class="brand-text">
+          <div class="brand-name">LondX</div>
+          <div class="brand-sub">Sistema v1.0</div>
+        </div>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="dashboard.html" class="nav-item" data-page="dashboard">
+          <span class="icon" data-icon="dashboard" data-size="17"></span> Dashboard
+        </a>
+        <a href="clientes.html" class="nav-item" data-page="clientes">
+          <span class="icon" data-icon="clients" data-size="17"></span> Clientes
+        </a>
+        <a href="prestamos.html" class="nav-item" data-page="prestamos">
+          <span class="icon" data-icon="loans" data-size="17"></span> Préstamos
+        </a>
+        <a href="pagos.html" class="nav-item" data-page="pagos">
+          <span class="icon" data-icon="payments" data-size="17"></span> Pagos
+        </a>
+        <a href="reportes.html" class="nav-item" data-page="reportes">
+          <span class="icon" data-icon="reports" data-size="17"></span> Reportes
+        </a>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="user-info">
+          <div class="user-avatar" id="userAvatar">A</div>
+          <div>
+            <div class="user-name" id="userName">Admin</div>
+            <div class="user-role" id="userRole">Administrador</div>
+          </div>
+        </div>
+        <button class="btn-logout" onclick="logout()">
+          <span class="icon" data-icon="back" data-size="14"></span> Salir
+        </button>
+      </div>
+    </aside>
+
+    <!-- Contenido principal -->
+    <main class="main-content">
+      <header class="topbar">
+        <div class="topbar-title">
+          <h1>Búsqueda de Cliente</h1>
+          <p>Consulta clientes y genera nuevos préstamos</p>
+        </div>
+        <div class="topbar-actions">
+          <div class="topbar-bell">
+            <span class="icon" data-icon="bell" data-size="19"></span>
+            <span class="dot"></span>
+          </div>
+          <div class="topbar-divider"></div>
+          <button class="btn-dark" onclick="abrirRegistro()">
+            <span class="icon" data-icon="plus" data-size="13"></span> Nuevo
+          </button>
+        </div>
+      </header>
+
+      <div class="page-content">
+        <div class="filter-caption">Selecciona el cliente a prestar</div>
+        <form class="filter-fields" id="filtroForm" onsubmit="event.preventDefault(); renderClientes();">
+          <div class="field"><label>ID</label><input type="text" id="fId" placeholder="P-001"/></div>
+          <div class="field"><label>Cédula</label><input type="text" id="fCedula" placeholder="000-0000000-0"/></div>
+          <div class="field"><label>Nombre</label><input type="text" id="fNombre" placeholder="Nombre"/></div>
+          <div class="field"><label>Apellido</label><input type="text" id="fApellido" placeholder="Apellido"/></div>
+          <div class="field"><label>Teléfono</label><input type="text" id="fTelefono" placeholder="809-..."/></div>
+          <button type="submit" class="btn-primary">Filtrar</button>
+        </form>
+
+        <div class="card">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Apellido</th>
+                <th>Teléfono</th>
+                <th>Cédula</th>
+                <th>Estado</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="tablaClientes">
+              <tr><td colspan="7" class="loading-row">Cargando...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- ── MODAL: Registro de Cliente ── -->
+  <div class="modal-overlay" id="modalRegistro">
+    <div class="modal">
+      <div class="modal-head">
+        <h2>Registro de Clientes</h2>
+        <button class="modal-close" onclick="closeModal('modalRegistro')">✕</button>
+      </div>
+      <div class="modal-body">
+        <form id="formRegistro" onsubmit="guardarCliente(event)">
+          <div class="photo-upload">
+            <div class="photo-circle"><span class="icon" data-icon="user" data-size="34"></span></div>
+            <div class="photo-info">
+              <div class="photo-title">Foto del cliente</div>
+              <div class="photo-hint">PNG o JPG</div>
+              <button type="button" class="btn-outline">Subir foto</button>
+            </div>
+          </div>
+
+          <div class="form-section-label">Datos Demográficos y Contacto</div>
+          <div class="form-grid">
+            <div class="field"><label>Nombre</label><input type="text" id="rNombre" required/></div>
+            <div class="field"><label>Apellido</label><input type="text" id="rApellido" required/></div>
+            <div class="field col-span"><label>Cédula</label><input type="text" id="rCedula" placeholder="000-0000000-0"/></div>
+            <div class="field"><label>Estado Civil</label>
+              <select id="rEstadoCivil"><option>Soltero/a</option><option>Casado/a</option><option>Unión libre</option><option>Divorciado/a</option></select>
+            </div>
+            <div class="field"><label>Fecha de Nacimiento</label><input type="date" id="rNacimiento"/></div>
+            <div class="field"><label>Género</label>
+              <select id="rGenero"><option>Masculino</option><option>Femenino</option><option>Otro</option></select>
+            </div>
+            <div class="field"><label>Nacionalidad</label><input type="text" id="rNacionalidad" value="Dominicana"/></div>
+            <div class="field"><label>Teléfono o Celular</label><input type="text" id="rTelefono" placeholder="809-000-0000" required/></div>
+            <div class="field"><label>Correo Electrónico</label><input type="email" id="rCorreo" placeholder="correo@ejemplo.com"/></div>
+          </div>
+
+          <div class="form-section-label">Dirección</div>
+          <div class="form-grid">
+            <div class="field col-span"><label>Dirección Completa</label><input type="text" id="rDireccion"/></div>
+            <div class="field"><label>Sector</label><input type="text" id="rSector"/></div>
+            <div class="field"><label>Provincia</label><input type="text" id="rProvincia"/></div>
+            <div class="field col-span"><label>Punto de referencia</label><input type="text" id="rReferencia"/></div>
+          </div>
+
+          <div class="form-section-label">Laboral</div>
+          <div class="form-grid">
+            <div class="field"><label>Profesión / Ocupación</label><input type="text" id="rProfesion"/></div>
+            <div class="field"><label>Lugar de Trabajo / Negocio</label><input type="text" id="rTrabajo"/></div>
+            <div class="field col-span"><label>Teléfono del Trabajo</label><input type="text" id="rTelTrabajo"/></div>
+            <div class="field"><label>Ingresos Mensuales</label><input type="text" id="rIngresos" placeholder="RD$0.00"/></div>
+            <div class="field"><label>Tipo de Ingreso</label>
+              <select id="rTipoIngreso"><option>Fijo</option><option>Variable</option><option>Negocio propio</option></select>
+            </div>
+          </div>
+
+          <div class="modal-actions">
+            <button type="submit" class="btn-primary btn-full">Guardar Cliente</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── MODAL: Crear Préstamo ── -->
+  <div class="modal-overlay" id="modalPrestamo">
+    <div class="modal modal-gold-top">
+      <div class="modal-head">
+        <h2 id="prestamoModalTitle">Crear Préstamo</h2>
+        <button class="modal-close" onclick="closeModal('modalPrestamo')">✕</button>
+      </div>
+      <div class="modal-body">
+        <!-- Form view -->
+        <div id="prestamoFormView">
+          <div class="section-title">Condiciones del Préstamo</div>
+          <div class="section-sub">Define el monto, plazo, interés y frecuencia de pago</div>
+          <div class="section-divider"></div>
+
+          <div class="entity-card" id="prestamoClienteCard"></div>
+
+          <form id="formPrestamo" onsubmit="aprobarPrestamo(event)">
+            <div class="form-grid">
+              <div class="field">
+                <label><span class="icon" data-icon="loans" data-size="13"></span> Monto</label>
+                <input type="text" id="pMonto" placeholder="RD$0.00" required/>
+                <div class="field-hint">Capital a desembolsar</div>
+              </div>
+              <div class="field">
+                <label><span class="icon" data-icon="reports" data-size="13"></span> Plazo (cuotas)</label>
+                <input type="number" id="pPlazo" placeholder="12" min="1" required/>
+                <div class="field-hint">Duración total en cuotas</div>
+              </div>
+              <div class="field">
+                <label><span class="icon" data-icon="trend" data-size="13"></span> Interés</label>
+                <input type="text" id="pInteres" placeholder="5%" required/>
+                <div class="field-hint">Tasa aplicada por período</div>
+              </div>
+              <div class="field">
+                <label><span class="icon" data-icon="payments" data-size="13"></span> Frecuencia</label>
+                <select id="pFrecuencia">
+                  <option>Mensual</option><option>Quincenal</option><option>Semanal</option>
+                </select>
+                <div class="field-hint">Periodicidad de los pagos</div>
+              </div>
+            </div>
+            <div class="modal-actions">
+              <button type="submit" class="btn-primary btn-arrow" style="flex:2">
+                Aprobar Préstamo <span class="icon" data-icon="arrow" data-size="15"></span>
+              </button>
+              <button type="button" class="btn-outline" style="flex:1" onclick="closeModal('modalPrestamo')">Cancelar</button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Success view -->
+        <div id="prestamoSuccessView" class="hidden">
+          <div class="approve-card">
+            <div class="approve-check"><span class="icon" data-icon="check" data-size="44" data-stroke-width="2.5"></span></div>
+            <div class="approve-title">¡Préstamo Aprobado!</div>
+            <div class="approve-sub">El préstamo ha sido registrado exitosamente en el sistema</div>
+            <div class="approve-id"><span class="icon" data-icon="loans" data-size="16"></span> <span id="approveId">P-000</span></div>
+            <div class="approve-summary">
+              <div class="as-item">
+                <div class="as-icon"><span class="icon" data-icon="loans" data-size="18"></span></div>
+                <div class="as-label">Monto</div>
+                <div class="as-value" id="approveMonto">RD$0</div>
+              </div>
+              <div class="as-item">
+                <div class="as-icon"><span class="icon" data-icon="trend" data-size="18"></span></div>
+                <div class="as-label">Interés</div>
+                <div class="as-value" id="approveInteres">5%</div>
+              </div>
+              <div class="as-item">
+                <div class="as-icon"><span class="icon" data-icon="reports" data-size="18"></span></div>
+                <div class="as-label">Cuotas</div>
+                <div class="as-value" id="approveCuotas">12 pagos</div>
+              </div>
+            </div>
+            <div class="approve-foot">El cliente recibirá una notificación con los detalles del préstamo</div>
+            <div class="modal-actions">
+              <button type="button" class="btn-primary btn-full" onclick="closeModal('modalPrestamo')">Finalizar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/icons.js"></script>
+  <script src="js/nav.js"></script>
+  <script src="js/common.js"></script>
+  <script src="js/clientes.js"></script>
+</body>
+</html>
