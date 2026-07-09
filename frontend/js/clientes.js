@@ -109,33 +109,36 @@ function abrirCrearPrestamo(cliente) {
   openModal('modalPrestamo');
 }
 
-function aprobarPrestamo(e) {
+async function aprobarPrestamo(e) {
   e.preventDefault();
-  const montoRaw = document.getElementById('pMonto').value.replace(/[^\d.]/g, '');
-  const monto   = parseFloat(montoRaw) || 0;
-  const plazo   = parseInt(document.getElementById('pPlazo').value) || 0;
-  const interes = document.getElementById('pInteres').value.trim() || '0%';
-  const frecuencia = document.getElementById('pFrecuencia').value;
+  const montoRaw   = document.getElementById('pMonto').value.replace(/[^\d.]/g, '');
+  const monto      = parseFloat(montoRaw) || 0;
+  const plazo      = parseInt(document.getElementById('pPlazo').value) || 0;
+  const interesRaw = document.getElementById('pInteres').value.replace(/[^\d.]/g, '');
+  const interes    = parseFloat(interesRaw) || 0;
   if (!monto || !plazo) return;
 
-  // Genera un ID de préstamo consecutivo y lo guarda para la vista de Préstamos.
-  const nuevos = JSON.parse(localStorage.getItem('nuevosPrestamos') || '[]');
-  const idNum = 6 + nuevos.length;
-  const idPrestamo = 'P-' + String(idNum).padStart(3, '0');
+  let idPrestamo = '';
+  try {
+    const res = await fetch(`${API_BASE}/prestamos`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...authHeaders() },
+      body: JSON.stringify({
+        idCliente: clienteSeleccionado.idCliente || parseInt(String(clienteSeleccionado.id).replace(/\D/g, '')),
+        monto, interes, cantidadCuotas: plazo
+      })
+    });
+    if (!res.ok) throw new Error();
+    const data = await res.json();
+    idPrestamo = 'P-' + String(data.idPrestamo).padStart(3, '0');
+  } catch {
+    alert('No se pudo crear el préstamo. Verifica que el servidor esté activo.');
+    return;
+  }
 
-  nuevos.push({
-    id: idPrestamo,
-    cliente: `${clienteSeleccionado.nombre} ${clienteSeleccionado.apellido}`,
-    telefono: clienteSeleccionado.telefono,
-    monto, tasa: interes, cuotas: plazo, pagadas: 0,
-    estado: 'Activo', proximoPago: frecuencia,
-  });
-  localStorage.setItem('nuevosPrestamos', JSON.stringify(nuevos));
-
-  // Pantalla de confirmación.
   document.getElementById('approveId').textContent      = idPrestamo;
   document.getElementById('approveMonto').textContent   = fmt(monto);
-  document.getElementById('approveInteres').textContent = interes;
+  document.getElementById('approveInteres').textContent = interes + '%';
   document.getElementById('approveCuotas').textContent  = `${plazo} pagos`;
   document.getElementById('prestamoModalTitle').textContent = 'Confirmación Préstamo';
   document.getElementById('prestamoFormView').classList.add('hidden');

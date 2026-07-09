@@ -18,9 +18,7 @@ async function fetchPrestamosFull() {
       { id: 'P-005', cliente: 'Miguel Torres',  telefono: '809-555-0505', monto: 15000, tasa: '4%', cuotas: 12, pagadas: 12, estado: 'Saldado',  proximoPago: '—' },
     ];
   }
-  // Añade préstamos aprobados desde la pantalla de Clientes.
-  const nuevos = JSON.parse(localStorage.getItem('nuevosPrestamos') || '[]');
-  prestamosData = prestamosData.concat(nuevos);
+  
   renderPrestamosFull();
 }
 
