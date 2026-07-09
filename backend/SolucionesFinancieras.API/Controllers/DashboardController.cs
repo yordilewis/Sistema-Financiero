@@ -93,11 +93,11 @@ public class DashboardController : ControllerBase
 
         const string sql = @"
             SELECT TOP 5 mensaje FROM (
-                SELECT CONCAT(c.Nombre, ' - cuota vencida en P-', RIGHT(''000'' + CAST(p.IdPrestamo AS VARCHAR), 3)) AS mensaje, cu.FechaVencimiento
+                SELECT CONCAT(c.Nombre, ' - cuota vencida en P-', RIGHT('000' + CAST(p.IdPrestamo AS VARCHAR), 3)) AS mensaje, cu.FechaVencimiento
                 FROM Cuotas cu
                 INNER JOIN Prestamos p ON cu.IdPrestamo = p.IdPrestamo
                 INNER JOIN Clientes c ON p.IdCliente = c.IdCliente
-                WHERE cu.Estado = ''Pendiente'' AND cu.FechaVencimiento < GETDATE()
+                WHERE cu.Estado = 'Pendiente' AND cu.FechaVencimiento < GETDATE()
             ) alertas
             ORDER BY FechaVencimiento";
 
@@ -123,7 +123,7 @@ public class DashboardController : ControllerBase
             INNER JOIN Prestamos p ON cu.IdPrestamo = p.IdPrestamo
             INNER JOIN Clientes c ON p.IdCliente = c.IdCliente
             WHERE CAST(cu.FechaVencimiento AS DATE) = CAST(GETDATE() AS DATE)
-              AND cu.Estado = ''Pendiente''
+              AND cu.Estado = 'Pendiente'
             ORDER BY c.Nombre";
 
         using var cmd    = new SqlCommand(sql, conn);
