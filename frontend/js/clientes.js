@@ -15,9 +15,6 @@ async function fetchClientes() {
       { id: 'C-005', nombre: 'Miguel',  apellido: 'Torres',  telefono: '809-555-0505', cedula: '056-7890123-5', estado: 'Saldado'  },
     ];
   }
-  // Añade clientes creados en esta sesión.
-  const nuevos = JSON.parse(localStorage.getItem('nuevosClientes') || '[]');
-  clientesData = clientesData.concat(nuevos);
   renderClientes();
 }
 
@@ -62,7 +59,7 @@ function renderClientes() {
 // ── Registro de cliente ──────────────────────────────────────
 function abrirRegistro() { openModal('modalRegistro'); }
 
-function guardarCliente(e) {
+async function guardarCliente(e) {
   e.preventDefault();
   const nombre   = document.getElementById('rNombre').value.trim();
   const apellido = document.getElementById('rApellido').value.trim();
@@ -70,16 +67,21 @@ function guardarCliente(e) {
   const cedula   = document.getElementById('rCedula').value.trim() || '000-0000000-0';
   if (!nombre || !apellido || !telefono) return;
 
-  const nuevo = { id: 'C-' + String(clientesData.length + 1).padStart(3, '0'), nombre, apellido, telefono, cedula, estado: 'Activo' };
-  clientesData.push(nuevo);
-
-  const nuevos = JSON.parse(localStorage.getItem('nuevosClientes') || '[]');
-  nuevos.push(nuevo);
-  localStorage.setItem('nuevosClientes', JSON.stringify(nuevos));
+  try {
+    const res = await fetch(`${API_BASE}/clientes`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...authHeaders() },
+      body: JSON.stringify({ nombre, apellido, telefono, cedula, direccion: '' })
+    });
+    if (!res.ok) throw new Error();
+  } catch {
+    alert('No se pudo registrar el cliente. Verifica que el servidor esté activo.');
+    return;
+  }
 
   document.getElementById('formRegistro').reset();
   closeModal('modalRegistro');
-  renderClientes();
+  fetchClientes(); // recarga la lista desde la base de datos
 }
 
 // ── Crear préstamo ───────────────────────────────────────────
