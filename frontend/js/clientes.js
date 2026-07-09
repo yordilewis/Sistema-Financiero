@@ -116,6 +116,7 @@ async function aprobarPrestamo(e) {
   const plazo      = parseInt(document.getElementById('pPlazo').value) || 0;
   const interesRaw = document.getElementById('pInteres').value.replace(/[^\d.]/g, '');
   const interes    = parseFloat(interesRaw) || 0;
+  const frecuencia = document.getElementById('pFrecuencia').value;
   if (!monto || !plazo) return;
 
   let idPrestamo = '';
@@ -125,7 +126,7 @@ async function aprobarPrestamo(e) {
       headers: { 'Content-Type': 'application/json', ...authHeaders() },
       body: JSON.stringify({
         idCliente: clienteSeleccionado.idCliente || parseInt(String(clienteSeleccionado.id).replace(/\D/g, '')),
-        monto, interes, cantidadCuotas: plazo
+        monto, interes, cantidadCuotas: plazo, frecuencia
       })
     });
     if (!res.ok) throw new Error();

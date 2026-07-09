@@ -11,16 +11,10 @@ async function fetchPagos() {
     if (!res.ok) throw new Error();
     pagosData = await res.json();
   } catch {
-    pagosData = [
-      { recibo: 'PG-098', cliente: 'Carlos Mendoza', prestamo: 'P-001', monto: 2500, fecha: '15 May 2026', metodo: 'Efectivo' },
-      { recibo: 'PG-097', cliente: 'Ana Jiménez',    prestamo: 'P-002', monto: 2200, fecha: '14 May 2026', metodo: 'Transferencia' },
-      { recibo: 'PG-096', cliente: 'Luisa Pérez',    prestamo: 'P-004', monto: 4100, fecha: '13 May 2026', metodo: 'Efectivo' },
-      { recibo: 'PG-095', cliente: 'Carlos Mendoza', prestamo: 'P-001', monto: 2500, fecha: '01 May 2026', metodo: 'Efectivo' },
-      { recibo: 'PG-094', cliente: 'Miguel Torres',  prestamo: 'P-005', monto: 1400, fecha: '28 Abr 2026', metodo: 'Transferencia' },
-    ];
+    pagosData = [];
   }
   renderPagos();
-  poblarSelects();
+  poblarPrestamos();
 }
 
 function renderPagos() {
@@ -37,45 +31,44 @@ function renderPagos() {
     </tr>`).join('');
 }
 
-function poblarSelects() {
-  const clientes = [...new Set(pagosData.map(p => p.cliente))];
-  const prestamos = [...new Set(pagosData.map(p => p.prestamo))];
-  const selCliente = document.getElementById('pagoCliente');
+async function poblarPrestamos() {
   const selPrestamo = document.getElementById('pagoPrestamo');
-  clientes.forEach(c => selCliente.insertAdjacentHTML('beforeend', `<option value="${c}">${c}</option>`));
-  prestamos.forEach(p => selPrestamo.insertAdjacentHTML('beforeend', `<option value="${p}">${p}</option>`));
+  const selCliente  = document.getElementById('pagoCliente');
+  selPrestamo.length = 1; // conserva "Seleccionar préstamo"
+  selCliente.length  = 1; // conserva "Seleccionar cliente"
+  try {
+    const res = await fetch(`${API_BASE}/prestamos`, { headers: authHeaders() });
+    if (!res.ok) throw new Error();
+    const prestamos = await res.json();
+    prestamos.forEach(p => selPrestamo.insertAdjacentHTML('beforeend',
+      `<option value="${p.idPrestamo}">${p.id} · ${p.cliente}</option>`));
+    [...new Set(prestamos.map(p => p.cliente))].forEach(c =>
+      selCliente.insertAdjacentHTML('beforeend', `<option value="${c}">${c}</option>`));
+  } catch {}
 }
 
 async function handleRegistrarPago(e) {
   e.preventDefault();
-  const cliente  = document.getElementById('pagoCliente').value;
-  const prestamo = document.getElementById('pagoPrestamo').value;
-  const monto    = parseFloat(document.getElementById('pagoMonto').value.replace(/[^\d.]/g, '')) || 0;
-  const fecha    = document.getElementById('pagoFecha').value;
-  const metodo   = document.getElementById('pagoMetodo').value;
-
-  if (!cliente || !prestamo || !monto) return;
-
-  const nuevoPago = {
-    cliente, prestamo, monto, metodo,
-    recibo: 'PG-' + Math.floor(100 + Math.random() * 900),
-    fecha: fecha ? fmtFecha(fecha) : fmtFecha(new Date()),
-  };
+  const idPrestamo = parseInt(document.getElementById('pagoPrestamo').value) || 0;
+  const monto  = parseFloat(document.getElementById('pagoMonto').value.replace(/[^\d.]/g, '')) || 0;
+  const fecha  = document.getElementById('pagoFecha').value;
+  const metodo = document.getElementById('pagoMetodo').value;
+  if (!idPrestamo || !monto) { alert('Selecciona un préstamo e ingresa el monto.'); return; }
 
   try {
     const res = await fetch(`${API_BASE}/pagos`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', ...authHeaders() },
-      body: JSON.stringify({ cliente, prestamo, monto, fecha, metodo }),
+      body: JSON.stringify({ idPrestamo, monto, fecha: fecha || null, metodo })
     });
     if (!res.ok) throw new Error();
   } catch {
-    // Sin backend disponible para pagos todavía: refleja el registro localmente.
+    alert('No se pudo registrar el pago. Verifica que el servidor esté activo.');
+    return;
   }
 
-  pagosData.unshift(nuevoPago);
-  renderPagos();
   document.getElementById('formPago').reset();
+  fetchPagos();
 }
 
 fetchPagos();

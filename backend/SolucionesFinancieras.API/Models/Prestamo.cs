@@ -20,4 +20,5 @@ public class PrestamoRequest
     public decimal Monto { get; set; }
     public decimal Interes { get; set; }
     public int CantidadCuotas { get; set; }
+    public string Frecuencia { get; set; } = "Mensual";
 }
